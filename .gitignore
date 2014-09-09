@@ -1,3 +1,4 @@
 /node_modules/
 /.idea/
 /public/stylesheets/*.css
+/npm-debug.log
