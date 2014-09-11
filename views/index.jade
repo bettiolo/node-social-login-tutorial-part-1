@@ -1,8 +1,10 @@
 extends layout
 
 block content
-	h1= title
-	p Welcome to #{title}
-	span#gConnect
-	button#signinButton Sign in with Google
+	h1 Social Login Client-side Example
+	div#login
+		span.g-signin(
+			data-width='wide',
+			data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
 	pre#loginData
+	img#profileImage

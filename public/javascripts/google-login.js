@@ -13,35 +13,22 @@
 /* Executed when the APIs finish loading */
 function render() {
 	console.log('render() called');
-	gapi.auth.signIn({ 'callback': onSignInCallback });
-
-	var signinButton = document.getElementById('signinButton');
-	signinButton.addEventListener('click', function () {
-		gapi.auth.signIn({
-			'callback': onSignInCallback
-		});
+	gapi.auth.signIn({
+		callback: onSignInCallback,
+		scope: 'https://www.googleapis.com/auth/plus.profile.emails.read'
 	});
-
 }
 
 function renderLoginButton() {
 	"use strict";
-	gapi.signin.render("gConnect", {
-		'callback': onSignInCallback,
-		'cookiepolicy': 'single_host_origin',
-		'requestvisibleactions': 'http://schema.org/AddAction',
-		'scope': 'https://www.googleapis.com/auth/plus.profile.emails.read',
-		'width': 'wide'
-	});
+	gapi.signin.go();
 }
 
 function onSignInCallback(authResult) {
 	console.log('onSignInCallback() called, status: ');
 	console.log(authResult['status']);
 	if (authResult['status']['signed_in']) {
-		// Update the app to reflect a signed in user
-		// Hide the sign-in button now that the user is authorized, for example:
-		document.getElementById('gConnect').setAttribute('style', 'display: none');
+		document.getElementById('login').setAttribute('style', 'display: none');
 		console.log(authResult);
 		getProfile();
 	} else {
@@ -53,7 +40,6 @@ function onSignInCallback(authResult) {
 		console.log('Sign-in state: ' + authResult['error']);
 		renderLoginButton();
 	}
-	//  // Will use page level configuration
 }
 
 function getProfile() {
@@ -63,15 +49,18 @@ function getProfile() {
 			'userId': 'me'
 		});
 		request.execute(function (resp) {
-			console.log('Retrieved profile for:' + resp.displayName);
 			console.log(resp);
+
+			document.getElementById('loginData').innerHTML +=
+				'Display name: ' + resp.displayName + '\n';
+
+			document.getElementById('profileImage').setAttribute('src', resp.image.url);
 
 			var primaryEmail;
 			for (var i = 0; i < resp.emails.length; i++) {
 				if (resp.emails[i].type === 'account') primaryEmail = resp.emails[i].value;
 			}
-			console.log('Primary email: ' + primaryEmail);
-			document.getElementById('loginData').innerHTML =
+			document.getElementById('loginData').innerHTML +=
 				'Primary email: ' + primaryEmail + '\n';
 
 			document.getElementById('loginData').innerHTML +=
@@ -80,15 +69,11 @@ function getProfile() {
 			document.getElementById('loginData').innerHTML +=
 				'Domain: ' + resp.domain + '\n';
 
-//            document.getElementById('loginData').innerHTML +=
-//              'Customer ID: ' + resp.customerId + '\n';
-
 			if (resp.organizations) {
 				var organisation;
 				for (var i = 0; i < resp.organizations.length; i++) {
 					if (resp.organizations[i].type === 'work') organisation = resp.organizations[i].name;
 				}
-				console.log('Organisation: ' + organisation);
 				document.getElementById('loginData').innerHTML +=
 					'Organisation: ' + organisation + '\n';
 			}
