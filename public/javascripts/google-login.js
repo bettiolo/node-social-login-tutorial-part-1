@@ -11,8 +11,16 @@
 
 /* Executed when the APIs finish loading */
 function render() {
-    console.log('render() called');
-    gapi.auth.signIn({ 'callback': onSignInCallback });
+  console.log('render() called');
+  gapi.auth.signIn({ 'callback': onSignInCallback });
+
+  var signinButton = document.getElementById('signinButton');
+  signinButton.addEventListener('click', function() {
+    gapi.auth.signIn({
+      'callback': onSignInCallback
+    });
+  });
+
 }
 
 function renderLoginButton() {
@@ -62,16 +70,27 @@ function getProfile() {
                 if (resp.emails[i].type === 'account') primaryEmail = resp.emails[i].value;
             }
             console.log('Primary email: ' + primaryEmail);
-
-            var organisation;
-            for (var i=0; i < resp.organizations.length; i++) {
-                if (resp.organizations[i].type === 'work') organisation = resp.organizations[i].name;
-            }
-            console.log('Organisation: ' + organisation);
-
             document.getElementById('loginData').innerHTML =
-                'Primary email: ' + primaryEmail + '\n'
-                + 'Organisation: ' + organisation
+              'Primary email: ' + primaryEmail + '\n';
+
+            document.getElementById('loginData').innerHTML +=
+              'User ID: ' + resp.id + '\n';
+
+            document.getElementById('loginData').innerHTML +=
+              'Domain: ' + resp.domain + '\n';
+
+//            document.getElementById('loginData').innerHTML +=
+//              'Customer ID: ' + resp.customerId + '\n';
+
+            if (resp.organizations) {
+              var organisation;
+              for (var i=0; i < resp.organizations.length; i++) {
+                if (resp.organizations[i].type === 'work') organisation = resp.organizations[i].name;
+              }
+              console.log('Organisation: ' + organisation);
+              document.getElementById('loginData').innerHTML +=
+                'Organisation: ' + organisation + '\n';
+            }
         });
     });
 
