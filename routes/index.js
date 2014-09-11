@@ -5,7 +5,7 @@ var router = express.Router();
 router.get('/', function(req, res) {
   res.render('index', {
       title: 'Express',
-      googleClientId: process.env.GOOGLE_CLIENT_ID
+      googleClientId: req.app.get('GOOGLE_CLIENT_ID')
   });
 });
 

@@ -10,7 +10,11 @@ var users = require('./routes/users');
 
 var app = express();
 
-// view engine setup
+if (!process.env.GOOGLE_CLIENT_ID) {
+  throw new Error('GOOGLE_CLIENT_ID environment variable not set!')
+}
+app.set('GOOGLE_CLIENT_ID', process.env.GOOGLE_CLIENT_ID);
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -56,6 +60,5 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
 
 module.exports = app;
