@@ -1,35 +1,18 @@
 (function () {
-	window.___gcfg = {
-		parsetags: 'explicit'
-	};
 	var po = document.createElement('script');
 	po.type = 'text/javascript';
 	po.async = true;
-	po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
+	po.src = 'https://apis.google.com/js/client:plusone.js';
 	var s = document.getElementsByTagName('script')[0];
 	s.parentNode.insertBefore(po, s);
 })();
-
-/* Executed when the APIs finish loading */
-function render() {
-	console.log('render() called');
-	gapi.auth.signIn({
-		callback: onSignInCallback,
-		scope: 'https://www.googleapis.com/auth/plus.profile.emails.read'
-	});
-}
-
-function renderLoginButton() {
-	"use strict";
-	gapi.signin.go();
-}
 
 function onSignInCallback(authResult) {
 	console.log('onSignInCallback() called, status: ');
 	console.log(authResult['status']);
 	if (authResult['status']['signed_in']) {
-		document.getElementById('login').setAttribute('style', 'display: none');
 		console.log(authResult);
+		hideLogin();
 		getProfile();
 	} else {
 		// Update the app to reflect a signed out user
@@ -38,8 +21,16 @@ function onSignInCallback(authResult) {
 		//   "access_denied" - User denied access to your app
 		//   "immediate_failed" - Could not automatically log in the user
 		console.log('Sign-in state: ' + authResult['error']);
-		renderLoginButton();
+		showLogin();
 	}
+}
+
+function hideLogin() {
+	document.getElementById('login').setAttribute('style', 'display: none');
+}
+
+function showLogin() {
+	document.getElementById('login').setAttribute('style', 'display: initial');
 }
 
 function getProfile() {

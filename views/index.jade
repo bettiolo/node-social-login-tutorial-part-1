@@ -5,6 +5,7 @@ block content
 	div#login
 		span.g-signin(
 			data-width='wide',
-			data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
+			data-scope='https://www.googleapis.com/auth/plus.profile.emails.read',
+			data-callback='onSignInCallback')
 	pre#loginData
 	img#profileImage
