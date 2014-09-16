@@ -1,12 +1,3 @@
-(function () {
-	var po = document.createElement('script');
-	po.type = 'text/javascript';
-	po.async = true;
-	po.src = 'https://apis.google.com/js/client:plusone.js';
-	var s = document.getElementsByTagName('script')[0];
-	s.parentNode.insertBefore(po, s);
-})();
-
 function onSignInCallback(authResult) {
 	console.log('onSignInCallback() called, status: ');
 	console.log(authResult['status']);
@@ -26,11 +17,11 @@ function onSignInCallback(authResult) {
 }
 
 function hideLogin() {
-	document.getElementById('login').setAttribute('style', 'display: none');
+	// document.getElementById('login').setAttribute('style', 'display: none');
 }
 
 function showLogin() {
-	document.getElementById('login').setAttribute('style', 'display: initial');
+	// document.getElementById('login').setAttribute('style', 'display: initial');
 }
 
 function getProfile() {

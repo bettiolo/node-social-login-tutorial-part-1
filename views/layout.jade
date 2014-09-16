@@ -1,10 +1,22 @@
 doctype html
-html
+html(lang='en', ng-app='app')
 	head
 		title Social Login Client-side Example
-		link(rel='stylesheet', href='/stylesheets/style.css')
+		meta(charset='utf-8')
 		meta(name='google-signin-clientid', content= googleClientId)
 		meta(name='google-signin-cookiepolicy', content='single_host_origin')
-		script(type='text/javascript', src='/javascripts/google-login.js')
-	body
-		block content
+		link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Roboto+Light')
+		link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+		link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(src='//apis.google.com/js/client:plusone.js')
+		script(src='//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+		script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.24/angular.min.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.24/angular-route.min.js')
+		script(src='/javascripts/google-login.js')
+	body(ng-controller='mainController')
+		include navbar
+		.container
+			block content
+			.ng-view
