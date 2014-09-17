@@ -2,30 +2,44 @@ var googleLogin = function () {
 
 	function GoogleLogin() {
 		console.log('GoogleLogin init');
-		this.loginStatus = 'logging_in'
+		this.setStatus('logging_in');
 	}
 	GoogleLogin.prototype.setLoggedIn = function () {
 		console.log('GoogleLogin logged in');
-		this.loginStatus = 'logged_in'
+		this.setStatus('logged_in');
 	};
 	GoogleLogin.prototype.setLoggedOut = function () {
-		this.loginStatus = 'logged_out'
+		this.setStatus('logged_out');
 	};
 	GoogleLogin.prototype.setLoggingIn = function () {
-		this.loginStatus = 'logging_in'
+		this.setStatus('logging_in');
 	};
 	GoogleLogin.prototype.setLoggingOut = function () {
-		this.loginStatus = 'logging_out'
+		this.setStatus('logging_out');
 	};
 	GoogleLogin.prototype.getStatus = function () {
 		return this.loginStatus;
 	};
+	GoogleLogin.prototype.setStatus = function (status) {
+		if (status != this.loginStatus) {
+			this.loginStatus = status;
+			if (this.statusUpdatedCallback) {
+				this.statusUpdatedCallback();
+			}
+		}
+	};
+	GoogleLogin.prototype.setStatusUpdateCallback = function (statusUpdateCallback) {
+		this.statusUpdatedCallback = statusUpdateCallback;
+	};
+
 	return new GoogleLogin();
 }();
 
 app.service('loginService', function () {
 	console.log('login service init');
-	this.getStatus = googleLogin.getStatus;
+	googleLogin.setStatusUpdateCallback(function () {
+		this.loginStatus = googleLogin.getStatus();
+	});
 });
 
 function onSignInCallback(authResult) {
