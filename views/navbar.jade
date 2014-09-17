@@ -9,18 +9,18 @@ nav.navbar.navbar-default(role='navigation', ng-controller='navController')
 			a.navbar-brand(href='#') Brand
 		#navbar-collapse.collapse.navbar-collapse
 			ul.nav.navbar-nav.navbar-right
-				li.working(ng-show='working')
+				li.working(ng-show='isBusy()')
 					p.navbar-text
 						i.fa.fa-circle-o-notch.fa-spin
 						| &nbsp;Working ...
-				li.signIn(ng-hide='loggedIn')
+				li.signIn(ng-hide='isLoggedIn()')
 					p.navbar-text
 						span.g-signin(
 							data-width='wide',
 							data-scope='https://www.googleapis.com/auth/plus.profile.emails.read',
 							data-callback='onSignInCallback')
-				li.profileName(ng-show='loggedIn')
+				li.profileName(ng-show='isLoggedIn()')
 					p.navbar-text Marco Bettiolo
 						a.text-right(ng-click='logout()') (Sign out)
-				li.profileImage(ng-show='loggedIn')
+				li.profileImage(ng-show='isLoggedIn()')
 					img.img-circle(ng-src='profileImage')
