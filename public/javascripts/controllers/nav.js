@@ -1,25 +1,18 @@
 app.controller('navController', function ($scope, $location, $timeout, loginService) {
-	$scope.isBusy = function () {
-		var status = loginService.loginStatus;
-		return status == 'logging_in'
-			|| status == 'logging_out';
+	$scope.$watch('loginService.data.loginStatus', function (newValue) {
+		console.log('navController watch', newValue);
+	});
+	loginService.setStatusUpdatedCallback(function () {
+		console.log('navController: ' + loginService.data.loginStatus);
+		var loginStatus = loginService.data.loginStatus;
+		$scope.isBusy = function () {
+			return loginStatus == 'logging_in' || loginStatus == 'logging_out';
+		};
+		$scope.isLoggedIn = function() {
+			return loginStatus == 'logged_in';
+		}
+	});
+	$scope.logout = function () {
+		loginService.logout();
 	};
-	$scope.isLoggedIn = function () {
-		return loginService.loginStatus == 'logged_in';
-	};
-
-//	$scope.login = function () {
-//		$scope.loginStatus = 'logging_in';
-//		$timeout(function () {
-//			$scope.loginStatus = 'logged_in';
-//			loginService.login();
-//		}, 1000);
-//	};
-//	$scope.logout = function () {
-//		$scope.loginStatus = 'logging_out';
-//		$timeout(function () {
-//			$scope.loginStatus = 'logged_out';
-//			loginService.logout();
-//		}, 1000);
-
 });

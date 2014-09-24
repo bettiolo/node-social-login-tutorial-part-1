@@ -1,64 +1,99 @@
-var googleLogin = function () {
+app.service('loginService', function () {
+	console.log('loginService init');
 
-	function GoogleLogin() {
-		console.log('GoogleLogin init');
-		this.setStatus('logging_in');
-	}
-	GoogleLogin.prototype.setLoggedIn = function () {
+	var _statusUpdatedCallback;
+	this.data = { loginStatus : 'logging_in' };
+
+	this.setStatusUpdatedCallback = function(statusUpdatedCallback) {
+		_statusUpdatedCallback = statusUpdatedCallback;
+		_statusUpdatedCallback();
+	};
+
+	this.setLoggedIn = function () {
 		console.log('GoogleLogin logged in');
 		this.setStatus('logged_in');
 	};
-	GoogleLogin.prototype.setLoggedOut = function () {
+	this.setLoggedOut = function () {
 		this.setStatus('logged_out');
 	};
-	GoogleLogin.prototype.setLoggingIn = function () {
+	this.setLoggingIn = function () {
 		this.setStatus('logging_in');
 	};
-	GoogleLogin.prototype.setLoggingOut = function () {
+	this.setLoggingOut = function () {
 		this.setStatus('logging_out');
 	};
-	GoogleLogin.prototype.getStatus = function () {
-		return this.loginStatus;
-	};
-	GoogleLogin.prototype.setStatus = function (status) {
-		if (status != this.loginStatus) {
-			this.loginStatus = status;
-			if (this.statusUpdatedCallback) {
-				this.statusUpdatedCallback();
+	this.setStatus = function (status) {
+		console.log('New Status: ' + status);
+		if (status != this.data.loginStatus) {
+			this.data.loginStatus = status;
+			if (_statusUpdatedCallback) {
+				_statusUpdatedCallback();
 			}
 		}
 	};
-	GoogleLogin.prototype.setStatusUpdateCallback = function (statusUpdateCallback) {
-		this.statusUpdatedCallback = statusUpdateCallback;
+
+	this.logout = function() {
+		disconnectUser(gapi.auth.getToken().access_token);
+		gapi.auth.signOut();
 	};
 
-	return new GoogleLogin();
-}();
+	this.setLoggingIn();
 
-app.service('loginService', function () {
-	console.log('login service init');
-	googleLogin.setStatusUpdateCallback(function () {
-		this.loginStatus = googleLogin.getStatus();
-	});
+	function disconnectUser(access_token) {
+		var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' +
+			access_token;
+
+		console.log('disconnecting');
+		// Perform an asynchronous GET request.
+		$.ajax({
+			type: 'GET',
+			url: revokeUrl,
+			async: false,
+			contentType: "application/json",
+			dataType: 'jsonp',
+			success: function(nullResponse) {
+				// Do something now that user is disconnected
+				// The response is always undefined.
+				console.log('disconnected');
+			},
+			error: function(e) {
+				// Handle the error
+				console.log(e);
+				// You could point users to manually disconnect if unsuccessful
+				// https://plus.google.com/apps
+			}
+		});
+	}
+
+
+	gapi.signin.render('signInButton',
+		{
+			'callback': onSignInCallback
+		}
+	);
+
+	var _this = this;
+
+	function onSignInCallback(authResult) {
+		console.log('onSignInCallback() called, status:', authResult['status']);
+		if (authResult['status']['signed_in']) {
+			console.log(authResult);
+			_this.setLoggedIn();
+			// getProfile();
+		} else {
+			// Update the app to reflect a signed out user
+			// Possible error values:
+			//   "user_signed_out" - User is signed-out
+			//   "access_denied" - User denied access to your app
+			//   "immediate_failed" - Could not automatically log in the user
+			console.log('Sign-in state: ' + authResult['error']);
+			_this.setLoggedOut();
+		}
+	}
+
 });
 
-function onSignInCallback(authResult) {
-	console.log('onSignInCallback() called, status: ');
-	console.log(authResult['status']);
-	if (authResult['status']['signed_in']) {
-		console.log(authResult);
-		googleLogin.setLoggedIn();
-		// getProfile();
-	} else {
-		// Update the app to reflect a signed out user
-		// Possible error values:
-		//   "user_signed_out" - User is signed-out
-		//   "access_denied" - User denied access to your app
-		//   "immediate_failed" - Could not automatically log in the user
-		console.log('Sign-in state: ' + authResult['error']);
-		googleLogin.setLoggedOut();
-	}
-}
+
 
 function getProfile() {
 	"use strict";
