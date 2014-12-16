@@ -14,7 +14,7 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 	this.init = function () {
 		$timeout(function () {
 			gapi.signin.render('signInButton', {
-				callback : function (authResult) { $rootScope.$apply(function () { onSignInCallback(authResult); });
+				callback : function (authResult) { $timeout(function () { onSignInCallback(authResult); });
 			}});
 		});
 	};
@@ -29,6 +29,7 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 		return this.getStatus() === 'logged_in';
 	};
 	this.logout = function() {
+		setStatus('logging_out');
 		if (document.location.hostname == "localhost") {
 			disconnectUser(gapi.auth.getToken().access_token);
 		}
@@ -38,16 +39,15 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 	this.user = null;
 
 	function disconnectUser(access_token) {
-		setStatus('logging_out');
+		console.log('Disconnecting token', access_token);
 		var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + access_token;
-
 		// Perform an asynchronous GET request.
 		$http.jsonp(revokeUrl)
-			.success(function (data, status, headers, config) {
-				console.log('Logged Out', data, status, headers, config);
+			.success(function (data, status, headers, config, statusText) {
+				console.log('disconnectUser() Logged Out', data, status);
 			})
-			.error(function (data, status, headers, config) {
-				console.log('Error logging out', data, status, headers, config);
+			.error(function (data, status, headers, config, statusText) {
+				console.log('disconnectUser() Error', data, status, statusText);
 			});
 	}
 
@@ -64,8 +64,9 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 				//   "user_signed_out" - User is signed-out
 				//   "access_denied" - User denied access to your app
 				//   "immediate_failed" - Could not automatically log in the user
-				console.log('Sign-in state:', authResult['error']);
-				setStatus('logged_out');
+				if (_this.getStatus() !== 'logged_out') {
+					setStatus('logged_out');
+				}
 			}
 	}
 
