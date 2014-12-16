@@ -4,7 +4,6 @@ div(ng-show='login.isLoggedIn()')
 	p Display name: {{ login.user.displayName }}
 	p Emails:&nbsp;
 		span(ng-repeat='email in login.user.emails') {{ email.value }}
-	p Primary email: {{ login.user.primaryEmail }}
 	p User ID: {{ login.user.id }}
 	p Domain: {{ login.user.domain }}
 	p Organisations:&nbsp;
