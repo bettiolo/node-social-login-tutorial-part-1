@@ -27,11 +27,6 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(function (req, res, next) {
-	res.header('X-Frame-Options', 'GOFORIT');
-	next();
-});
-
 app.use('/templates', templates);
 app.use('/', index);
 
