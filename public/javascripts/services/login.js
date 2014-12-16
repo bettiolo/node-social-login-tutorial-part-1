@@ -1,4 +1,4 @@
-app.service('loginService', function ($rootScope, $timeout) {
+app.service('loginService', function ($rootScope, $timeout, $http) {
 	'use strict';
 	var _loginStatus = '';
 	var _this = this;
@@ -29,7 +29,9 @@ app.service('loginService', function ($rootScope, $timeout) {
 		return this.getStatus() === 'logged_in';
 	};
 	this.logout = function() {
-		disconnectUser(gapi.auth.getToken().access_token);
+		if (document.location.hostname == "localhost") {
+			disconnectUser(gapi.auth.getToken().access_token);
+		}
 		gapi.auth.signOut();
 	};
 	this.authStatus = null;
@@ -40,24 +42,13 @@ app.service('loginService', function ($rootScope, $timeout) {
 		var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + access_token;
 
 		// Perform an asynchronous GET request.
-		$.ajax({
-			type: 'GET',
-			url: revokeUrl,
-			async: false,
-			contentType: "application/json",
-			dataType: 'jsonp',
-			success: function(nullResponse) {
-				// Do something now that user is disconnected
-				// The response is always undefined.
-				console.log('disconnected');
-			},
-			error: function(e) {
-				// Handle the error
-				console.log(e);
-				// You could point users to manually disconnect if unsuccessful
-				// https://plus.google.com/apps
-			}
-		});
+		$http.jsonp(revokeUrl)
+			.success(function (data, status, headers, config) {
+				console.log('Logged Out', data, status, headers, config);
+			})
+			.error(function (data, status, headers, config) {
+				console.log('Error logging out', data, status, headers, config);
+			});
 	}
 
 	function onSignInCallback(authResult) {

@@ -1,5 +1,12 @@
 h1 Social Login Client-side Example
-| Status:
-span(ng-bind='login.getStatus()')
-pre#loginData
-img#profileImage
+p Status: {{ login.getStatus() }}
+p Display name: {{ login.user.displayName }}
+p Emails:&nbsp;
+	span(ng-repeat='email in login.user.emails') {{ email }}
+// if (resp.emails[i].type === 'account') primaryEmail = resp.emails[i].value;
+p Primary email: {{ login.user.primaryEmail }}
+p User ID: {{ login.user.id }}
+p Domain: {{ login.user.domain }}
+p Organisations:&nbsp;
+	span(ng-repeat='organisation in login.user.organizations') {{ organisation }}
+// if (resp.organizations[i].type === 'work') organisation = resp.organizations[i].name;
