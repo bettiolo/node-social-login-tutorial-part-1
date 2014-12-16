@@ -11,6 +11,13 @@ app.service('loginService', function ($rootScope, $timeout) {
 	}
 	setStatus('logging_in');
 
+	this.init = function () {
+		$timeout(function () {
+			gapi.signin.render('signInButton', {
+				callback : function (authResult) { $rootScope.$apply(function () { onSignInCallback(authResult); });
+			}});
+		});
+	};
 	this.getStatus = function () {
 		return _loginStatus;
 	};
@@ -53,38 +60,32 @@ app.service('loginService', function ($rootScope, $timeout) {
 		});
 	}
 
-	// $timeout(function () {
-		gapi.signin.render('signInButton', { callback : onSignInCallback });
-	// });
-
 	function onSignInCallback(authResult) {
-
-		// $rootScope.$apply(function () {
-			console.log('onSignInCallback() status:', authResult['status']);
+		console.log('onSignInCallback() status:', authResult['status']);
 		_this.authStatus = authResult;
 			if (authResult['status']['signed_in']) {
-				setStatus('logged_in');
-				// getUser();
+				if (_this.getStatus() !== 'logged_in') {
+					setStatus('logged_in');
+					getUser();
+				}
 			} else {
-				// Update the app to reflect a signed out user
 				// Possible error values:
 				//   "user_signed_out" - User is signed-out
 				//   "access_denied" - User denied access to your app
 				//   "immediate_failed" - Could not automatically log in the user
-				console.log('Sign-in state: ' + authResult['error']);
+				console.log('Sign-in state:', authResult['error']);
 				setStatus('logged_out');
 			}
-		// });
 	}
 
 	function getUser() {
-		var _this = this;
 		gapi.client.load('plus', 'v1', function () {
 			var request = gapi.client.plus.people.get({
 				'userId': 'me'
 			});
 			request.execute(function (resp) {
 				$rootScope.$apply(function () {
+					console.log('getUser() :', resp);
 					_this.user = resp;
 				});
 			});

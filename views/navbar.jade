@@ -22,4 +22,4 @@ nav#navbar-top.navbar.navbar-default(role='navigation', ng-controller='navContro
 					p.navbar-text Marco Bettiolo
 						a.text-right(ng-click='login.logout()') (Sign out)
 				li.profileImage(ng-show='login.isLoggedIn()')
-					img.img-circle(ng-src='login.user.profileImage')
+					img.img-circle(ng-src='{{ getProfileImageUrl() }}')
