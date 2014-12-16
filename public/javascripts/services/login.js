@@ -95,7 +95,8 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 				console.log('getTokenInfo() Success:', _this.tokenInfo);
 			})
 			.error(function (data, status, headers, config, statusText) {
-				console.log('getTokenInfo() Error', data, status, statusText);
+				_this.tokenInfo = data;
+				console.log('getTokenInfo() Error:', data, status);
 			});
 	}
 

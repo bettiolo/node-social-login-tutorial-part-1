@@ -8,4 +8,4 @@ div(ng-show='login.isLoggedIn()')
 	p Domain: {{ login.user.domain }}
 	p Organisation(s):&nbsp;
 		span(ng-repeat='organisation in login.user.organizations') {{ organisation.name }} ({{ organisation.type }})
-	p Server-side Google user: {{ login.tokenInfo.email }}
+	p Server-side Google user: {{ login.tokenInfo.error || login.tokenInfo.email }}
