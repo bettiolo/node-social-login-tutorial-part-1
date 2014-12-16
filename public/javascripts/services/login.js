@@ -11,6 +11,9 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 	}
 	setStatus('logging_in');
 
+	this.authStatus = null;
+	this.user = null;
+	this.tokenInfo = null;
 	this.init = function () {
 		$timeout(function () {
 			gapi.signin.render('signInButton', {
@@ -35,8 +38,6 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 		}
 		gapi.auth.signOut();
 	};
-	this.authStatus = null;
-	this.user = null;
 
 	function disconnectUser(access_token) {
 		console.log('Disconnecting token', access_token);
@@ -52,22 +53,25 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 	}
 
 	function onSignInCallback(authResult) {
-		console.log('onSignInCallback() status:', authResult['status']);
+		console.log('onSignInCallback() status:', authResult);
 		_this.authStatus = authResult;
-			if (authResult['status']['signed_in']) {
-				if (_this.getStatus() !== 'logged_in') {
-					setStatus('logged_in');
-					getUser();
-				}
-			} else {
-				// Possible error values:
-				//   "user_signed_out" - User is signed-out
-				//   "access_denied" - User denied access to your app
-				//   "immediate_failed" - Could not automatically log in the user
-				if (_this.getStatus() !== 'logged_out') {
-					setStatus('logged_out');
-				}
+		_this.user = null;
+		_this.tokenInfo = null;
+		if (authResult['status']['signed_in']) {
+			if (_this.getStatus() !== 'logged_in') {
+				setStatus('logged_in');
+				getTokenInfo();
+				getUser();
 			}
+		} else {
+			// Possible error values:
+			//   "user_signed_out" - User is signed-out
+			//   "access_denied" - User denied access to your app
+			//   "immediate_failed" - Could not automatically log in the user
+			if (_this.getStatus() !== 'logged_out') {
+				setStatus('logged_out');
+			}
+		}
 	}
 
 	function getUser() {
@@ -82,6 +86,17 @@ app.service('loginService', function ($rootScope, $timeout, $http) {
 				});
 			});
 		});
+	}
+
+	function getTokenInfo() {
+		$http.post('api/google/token-check', { access_token: _this.authStatus.access_token })
+			.success(function (data, status, headers, config, statusText) {
+				_this.tokenInfo = data;
+				console.log('getTokenInfo() Success:', _this.tokenInfo);
+			})
+			.error(function (data, status, headers, config, statusText) {
+				console.log('getTokenInfo() Error', data, status, statusText);
+			});
 	}
 
 });

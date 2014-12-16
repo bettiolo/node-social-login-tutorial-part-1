@@ -2,9 +2,10 @@ h1 Social Login Client-side Example
 p Status: {{ login.getStatus() }}
 div(ng-show='login.isLoggedIn()')
 	p Display name: {{ login.user.displayName }}
-	p Emails:&nbsp;
+	p Email(s):&nbsp;
 		span(ng-repeat='email in login.user.emails') {{ email.value }}
 	p User ID: {{ login.user.id }}
 	p Domain: {{ login.user.domain }}
-	p Organisations:&nbsp;
+	p Organisation(s):&nbsp;
 		span(ng-repeat='organisation in login.user.organizations') {{ organisation.name }} ({{ organisation.type }})
+	p Server-side Google user: {{ login.tokenInfo.email }}
