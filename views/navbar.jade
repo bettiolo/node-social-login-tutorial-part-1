@@ -17,8 +17,8 @@ nav#navbar-top.navbar.navbar-default(role='navigation', ng-controller='navContro
 					span#signInButton.g-signin(
 						data-width='wide',
 						data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
-				li.profileName(ng-show='login.isLoggedIn()')
-					p.navbar-text Marco Bettiolo
+				li.profileName(ng-show='login.user')
+					p.navbar-text {{ login.user.displayName }}
 						a.text-right(ng-click='login.logout()') (Sign out)
-				li.profileImage(ng-show='login.isLoggedIn()')
+				li.profileImage(ng-show='login.user')
 					img.img-circle(ng-src='{{ getProfileImageUrl() }}')
