@@ -3,8 +3,8 @@ app.controller('navController', function ($scope, $location, loginService) {
 	$scope.login = loginService;
 	$scope.getProfileImageUrl = function () {
 		if ($scope.login && $scope.login.user) {
-			return $scope.login.user.image.url;
+			return $scope.login.user.image.url.replace('sz=50', 'sz=48');
 		}
-		return '';
+		return 'images/unknown.png';
 	}
 });

@@ -6,7 +6,7 @@ nav#navbar-top.navbar.navbar-default(role='navigation', ng-controller='navContro
 				span.icon-bar
 				span.icon-bar
 				span.icon-bar
-			a.navbar-brand(href='#') Brand
+			a.navbar-brand(href='#') Social Login
 		#navbar-collapse.collapse.navbar-collapse
 			ul.nav.navbar-nav.navbar-right
 				li.working(ng-show='login.isBusy()')
@@ -14,10 +14,9 @@ nav#navbar-top.navbar.navbar-default(role='navigation', ng-controller='navContro
 						i.fa.fa-circle-o-notch.fa-spin
 						| &nbsp;Working ...
 				li.signIn(ng-hide='login.isLoggedIn() || login.isBusy()')
-						p.navbar-text
-							span#signInButton.g-signin(
-								data-width='wide',
-								data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
+					span#signInButton.g-signin(
+						data-width='wide',
+						data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
 				li.profileName(ng-show='login.isLoggedIn()')
 					p.navbar-text Marco Bettiolo
 						a.text-right(ng-click='login.logout()') (Sign out)
