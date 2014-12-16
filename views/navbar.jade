@@ -9,18 +9,17 @@ nav#navbar-top.navbar.navbar-default(role='navigation', ng-controller='navContro
 			a.navbar-brand(href='#') Brand
 		#navbar-collapse.collapse.navbar-collapse
 			ul.nav.navbar-nav.navbar-right
-				li.working(ng-show='isBusy()')
+				li.working(ng-show='login.isBusy()')
 					p.navbar-text
 						i.fa.fa-circle-o-notch.fa-spin
 						| &nbsp;Working ...
-				li.signIn(ng-hide='isLoggedIn()')
-					p.navbar-text
-						span#signInButton.g-signin(
-							data-width='wide',
-							data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
-							//data-callback='onSignInCallback')
-				li.profileName(ng-show='isLoggedIn()')
+				li.signIn(ng-hide='login.isLoggedIn() || login.isBusy()')
+						p.navbar-text
+							span#signInButton.g-signin(
+								data-width='wide',
+								data-scope='https://www.googleapis.com/auth/plus.profile.emails.read')
+				li.profileName(ng-show='login.isLoggedIn()')
 					p.navbar-text Marco Bettiolo
-						a.text-right(ng-click='logout()') (Sign out)
-				li.profileImage(ng-show='isLoggedIn()')
-					img.img-circle(ng-src='profileImage')
+						a.text-right(ng-click='login.logout()') (Sign out)
+				li.profileImage(ng-show='login.isLoggedIn()')
+					img.img-circle(ng-src='login.user.profileImage')

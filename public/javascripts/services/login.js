@@ -1,49 +1,37 @@
-app.service('loginService', function () {
-	console.log('loginService init');
+app.service('loginService', function ($rootScope, $timeout) {
+	'use strict';
+	var _loginStatus = '';
+	var _this = this;
 
-	var _statusUpdatedCallback;
-	this.data = { loginStatus : 'logging_in' };
-
-	this.setStatusUpdatedCallback = function(statusUpdatedCallback) {
-		_statusUpdatedCallback = statusUpdatedCallback;
-		_statusUpdatedCallback();
-	};
-
-	this.setLoggedIn = function () {
-		console.log('GoogleLogin logged in');
-		this.setStatus('logged_in');
-	};
-	this.setLoggedOut = function () {
-		this.setStatus('logged_out');
-	};
-	this.setLoggingIn = function () {
-		this.setStatus('logging_in');
-	};
-	this.setLoggingOut = function () {
-		this.setStatus('logging_out');
-	};
-	this.setStatus = function (status) {
-		console.log('New Status: ' + status);
-		if (status != this.data.loginStatus) {
-			this.data.loginStatus = status;
-			if (_statusUpdatedCallback) {
-				_statusUpdatedCallback();
-			}
+	function setStatus(status) {
+		console.log('LoginService status: ' + status);
+		if (status != _loginStatus) {
+			_loginStatus = status;
 		}
-	};
+	}
+	setStatus('logging_in');
 
+	this.getStatus = function () {
+		return _loginStatus;
+	};
+	this.isBusy = function () {
+		return this.getStatus() === 'logging_in'
+			|| this.getStatus() === 'logging_out';
+	};
+	this.isLoggedIn = function () {
+		return this.getStatus() === 'logged_in';
+	};
 	this.logout = function() {
 		disconnectUser(gapi.auth.getToken().access_token);
 		gapi.auth.signOut();
 	};
-
-	this.setLoggingIn();
+	this.authStatus = null;
+	this.user = null;
 
 	function disconnectUser(access_token) {
-		var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' +
-			access_token;
+		setStatus('logging_out');
+		var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + access_token;
 
-		console.log('disconnecting');
 		// Perform an asynchronous GET request.
 		$.ajax({
 			type: 'GET',
@@ -65,71 +53,42 @@ app.service('loginService', function () {
 		});
 	}
 
-
-	gapi.signin.render('signInButton',
-		{
-			'callback': onSignInCallback
-		}
-	);
-
-	var _this = this;
+	// $timeout(function () {
+		gapi.signin.render('signInButton', { callback : onSignInCallback });
+	// });
 
 	function onSignInCallback(authResult) {
-		console.log('onSignInCallback() called, status:', authResult['status']);
-		if (authResult['status']['signed_in']) {
-			console.log(authResult);
-			_this.setLoggedIn();
-			// getProfile();
-		} else {
-			// Update the app to reflect a signed out user
-			// Possible error values:
-			//   "user_signed_out" - User is signed-out
-			//   "access_denied" - User denied access to your app
-			//   "immediate_failed" - Could not automatically log in the user
-			console.log('Sign-in state: ' + authResult['error']);
-			_this.setLoggedOut();
-		}
+
+		// $rootScope.$apply(function () {
+			console.log('onSignInCallback() status:', authResult['status']);
+		_this.authStatus = authResult;
+			if (authResult['status']['signed_in']) {
+				setStatus('logged_in');
+				// getUser();
+			} else {
+				// Update the app to reflect a signed out user
+				// Possible error values:
+				//   "user_signed_out" - User is signed-out
+				//   "access_denied" - User denied access to your app
+				//   "immediate_failed" - Could not automatically log in the user
+				console.log('Sign-in state: ' + authResult['error']);
+				setStatus('logged_out');
+			}
+		// });
+	}
+
+	function getUser() {
+		var _this = this;
+		gapi.client.load('plus', 'v1', function () {
+			var request = gapi.client.plus.people.get({
+				'userId': 'me'
+			});
+			request.execute(function (resp) {
+				$rootScope.$apply(function () {
+					_this.user = resp;
+				});
+			});
+		});
 	}
 
 });
-
-
-
-function getProfile() {
-	"use strict";
-	gapi.client.load('plus', 'v1', function () {
-		var request = gapi.client.plus.people.get({
-			'userId': 'me'
-		});
-		request.execute(function (resp) {
-			console.log(resp);
-
-			document.getElementById('loginData').innerHTML +=
-				'Display name: ' + resp.displayName + '\n';
-
-			document.getElementById('profileImage').setAttribute('src', resp.image.url);
-
-			var primaryEmail;
-			for (var i = 0; i < resp.emails.length; i++) {
-				if (resp.emails[i].type === 'account') primaryEmail = resp.emails[i].value;
-			}
-			document.getElementById('loginData').innerHTML +=
-				'Primary email: ' + primaryEmail + '\n';
-
-			document.getElementById('loginData').innerHTML +=
-				'User ID: ' + resp.id + '\n';
-
-			document.getElementById('loginData').innerHTML +=
-				'Domain: ' + resp.domain + '\n';
-
-			if (resp.organizations) {
-				var organisation;
-				for (var i = 0; i < resp.organizations.length; i++) {
-					if (resp.organizations[i].type === 'work') organisation = resp.organizations[i].name;
-				}
-				document.getElementById('loginData').innerHTML +=
-					'Organisation: ' + organisation + '\n';
-			}
-		});
-	});
-}
